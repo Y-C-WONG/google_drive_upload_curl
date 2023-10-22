@@ -31,6 +31,7 @@ function _getAccessToken()
     ACCESS_TOKEN=$(curl --request POST -s \
     --data "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token" \
     https://oauth2.googleapis.com/token | jq ."access_token")
+    echo $ACCESS_TOKEN
 }
 
 UPLOAD_FILE=""
@@ -42,9 +43,26 @@ function _uploadToGoogleDrive()
     RESPONSE_JSON=$(curl -X POST -L -H "Authorization: Bearer $ACCESS_TOKEN" \
     -F "metadata={name : '$UPLOAD_FILE', parents : ['$DRIVE_FOLDER_ID']};type=application/json;charset=UTF-8" \
     -F "file=@$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
-
-    ERROR_CODE=$(echo $RESPONSE_JSON | jq .error.code)
-    DRIVE_FILE_NAME=$(echo $RESPONSE_JSON | jq .name)
-    DRIVE_FILE_ID=$(echo $RESPONSE_JSON | jq .id)
 }
 
+_getAccessToken
+_uploadToGoogleDrive
+echo "--end--"
+echo $RESPONSE_JSON
+ERROR_CODE=$(jq '.error.code' <<< $RESPONSE_JSON)
+echo $ERROR_CODE
+DRIVE_FILE_NAME=$(jq '.name' <<< $RESPONSE_JSON)
+echo $DRIVE_FILE_NAME
+DRIVE_FILE_ID=$(jq '.id' <<< $RESPONSE_JSON)
+echo $DRIVE_FILE_ID
+
+if [ $ERROR_CODE != "null" ];
+then
+    echo "error"
+    echo $ERROR_CODE
+    exit 1
+else
+    echo "no error"
+    echo $RESPONSE_JSON
+    exit 0
+fi
