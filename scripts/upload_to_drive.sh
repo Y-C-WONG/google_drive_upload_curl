@@ -3,8 +3,8 @@
 # This script upload file to google drive using google drive API
 # Author: Yau Chuen Wobng in October, 2023
 # -----------------------------------------
-# For first time useing google drive api, please get the authorization code, 
-# then exchange refresh token with the authorization code by content the google authorization api.
+# For first time using google drive api, please get the authorization code, 
+# then exchange refresh token with the authorization code by contant the google authorization api.
 # The authorization code only need once in most of the time.
 # The refresh token, once generated, it will be expired if not been used in six months of time.
 # The refresh token uses for exchange the access token which generate by the google authorization api.
@@ -47,7 +47,7 @@ function _uploadToGoogleDrive()
 
 _getAccessToken
 _uploadToGoogleDrive
-echo "--end--"
+
 echo $RESPONSE_JSON
 ERROR_CODE=$(jq '.error.code' <<< $RESPONSE_JSON)
 echo $ERROR_CODE
