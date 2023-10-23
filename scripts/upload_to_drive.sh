@@ -47,6 +47,9 @@ function _uploadToGoogleDrive()
     -F "file=@$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
 }
 
+SRC_DIR=$(dirname "$0")"/"
+. $SRC_DIR"drive_config.sh"
+
 _getAccessToken
 _uploadToGoogleDrive
 
