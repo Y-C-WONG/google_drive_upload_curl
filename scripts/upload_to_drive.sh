@@ -4,7 +4,7 @@
 # Author: Yau Chuen Wobng in October, 2023
 # -----------------------------------------
 # For first time using google drive api, please get the authorization code, 
-# then exchange refresh token with the authorization code by contant the google authorization api.
+# then exchange refresh token with the authorization code by calling the google authorization api.
 # The authorization code only need once in most of the time.
 # The refresh token, once generated, it will be expired if not been used in six months of time.
 # The refresh token uses for exchange the access token which generate by the google authorization api.
