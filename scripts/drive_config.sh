@@ -1,0 +1,10 @@
+#!/bin/bash
+
+CLIENT_ID=""
+SCOPE=""
+AUTH_CODE=""
+CLIENT_SECRET=""
+REFRESH_TOKEN=""
+UPLOAD_FILE=""
+MIMETYPE="Application/zip"
+DRIVE_FOLDER_ID=""
