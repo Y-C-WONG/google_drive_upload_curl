@@ -3,7 +3,9 @@
 # This script upload file to google drive using google drive API
 # Author: Yau Chuen Wobng in October, 2023
 # -----------------------------------------
-# For first time using google drive api, please get the authorization code, 
+# Before using any google api, please create Oauth2 credentials in the Google API console.
+# For more detail, please visit https://developers.google.com/identity/protocols/oauth2.
+# If you are the first time using the google drive api, please get the authorization code, 
 # then exchange refresh token with the authorization code by calling the google authorization api.
 # The authorization code only need once in most of the time.
 # The refresh token, once generated, it will be expired if not been used in six months of time.
