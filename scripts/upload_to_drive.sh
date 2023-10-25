@@ -23,12 +23,14 @@
 # ------------------------------------------
 # STEP 3: Get the access token
 # Fill in below information and run the _getAccessToken()
+
 CLIENT_ID=""
 SCOPE=""
 AUTH_CODE=""
 CLIENT_SECRET=""
 REFRESH_TOKEN=""
-function _getAccessToken() 
+
+function _getAccessToken()
 {
     ACCESS_TOKEN=$(curl --request POST -s \
     --data "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token" \
@@ -37,12 +39,12 @@ function _getAccessToken()
 }
 
 UPLOAD_FILE=""
-MIMETYPE="Application/zip"
+MIMETYPE=""
 DRIVE_FOLDER_ID=""
 
 function _uploadToGoogleDrive()
 {
-    RESPONSE_JSON=$(curl -X POST -L -H "Authorization: Bearer $ACCESS_TOKEN" \
+    RESPONSE_JSON=$(curl -X POST -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" \
     -F "metadata={name : '$UPLOAD_FILE', parents : ['$DRIVE_FOLDER_ID']};type=application/json;charset=UTF-8" \
     -F "file=@$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
 }
