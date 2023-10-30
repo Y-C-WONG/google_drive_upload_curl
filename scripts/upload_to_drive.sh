@@ -63,8 +63,7 @@ echo $DRIVE_FILE_NAME
 DRIVE_FILE_ID=$(grep -zoP '".id":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON)
 echo $DRIVE_FILE_ID
 
-if [ $ERROR_CODE != "null" ];
-then
+if [ $ERROR_CODE != "null" ]; then
     echo "error"
     echo $ERROR_CODE
     exit 1
