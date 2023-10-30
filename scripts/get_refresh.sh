@@ -24,7 +24,7 @@ then
     read AUTH_CODE
     REFRESH_REQ_DATA="code=$AUTH_CODE&client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&grant_type=authorization_code&redirect_uri=http://localhost"
     echo "curl --request POST -s --data \"$REFRESH_REQ_DATA\" $TOKEN_REQ_API_URL"
-    REFRESH_TOKEN=$(curl --request POST -s --data "$REFRESH_REQ_DATA" $TOKEN_REQ_API_URL | jq ."refresh_token")
+    REFRESH_TOKEN=$(curl --request POST -s --data "$REFRESH_REQ_DATA" $TOKEN_REQ_API_URL | grep -zoP '"refresh_token":\s*\K[^\s,]*(?=\s*,)')
     #echo $REFRESH_TOKEN
     printf '%*s\n' "$(tput cols)" '' | tr ' ' =\n
     sed -i -e "s%^\(AUTH_CODE=\).*%\1\"$AUTH_CODE\"%" -e "s%^\(REFRESH_TOKEN=\).*%\1\"$REFRESH_TOKEN\"%" drive_config.sh    echo !! AUTH_CODE and REFRESH_TOKEN SAVED !!
