@@ -34,7 +34,7 @@ function _getAccessToken()
 {
     ACCESS_TOKEN=$(curl --request POST -s \
     --data "client_id=$CLIENT_ID&client_secret=$CLIENT_SECRET&refresh_token=$REFRESH_TOKEN&grant_type=refresh_token" \
-    https://oauth2.googleapis.com/token | jq ."access_token")
+    https://oauth2.googleapis.com/token |  grep -zoP '"access_token":\s*\K[^\s,]*(?=\s*,)')
     echo $ACCESS_TOKEN
 }
 
@@ -56,11 +56,11 @@ _getAccessToken
 _uploadToGoogleDrive
 
 echo $RESPONSE_JSON
-ERROR_CODE=$(jq '.error.code' <<< $RESPONSE_JSON)
+ERROR_CODE=$(grep -zoP '".error.code":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON)
 echo $ERROR_CODE
-DRIVE_FILE_NAME=$(jq '.name' <<< $RESPONSE_JSON)
+DRIVE_FILE_NAME=$(grep -zoP '".name":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON)
 echo $DRIVE_FILE_NAME
-DRIVE_FILE_ID=$(jq '.id' <<< $RESPONSE_JSON)
+DRIVE_FILE_ID=$(grep -zoP '".id":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON)
 echo $DRIVE_FILE_ID
 
 if [ $ERROR_CODE != "null" ];
