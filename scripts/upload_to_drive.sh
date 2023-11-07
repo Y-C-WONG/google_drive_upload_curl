@@ -70,6 +70,6 @@ if [ $ERROR_CODE != "null" ]; then
 else
     echo "no error"
     echo $RESPONSE_JSON
-    echo $DRIVE_FILE_ID >> ${$DRIVE_FOLDER_ID:(-3)}.list
+    echo $DRIVE_FILE_ID >> ${DRIVE_FOLDER_ID:(-10)}.list
     exit 0
 fi
