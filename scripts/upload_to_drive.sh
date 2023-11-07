@@ -49,6 +49,11 @@ function _uploadToGoogleDrive()
     -F "file=@$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
 }
 
+function _deleteOnGoogleDrive()
+{
+    RESPONSE_JSON=$(curl -X DELETE -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" "https://www.googleapis.com/drive/v3/files/$DRIVE_FILE_ID")
+}
+
 SRC_DIR=$(dirname "$0")"/"
 . $SRC_DIR"drive_config.sh"
 
@@ -71,5 +76,6 @@ else
     echo "no error"
     echo $RESPONSE_JSON
     echo $DRIVE_FILE_ID >> ${DRIVE_FOLDER_ID:(-10)}.list
+    _deleteOnGoogleDrive
     exit 0
 fi
