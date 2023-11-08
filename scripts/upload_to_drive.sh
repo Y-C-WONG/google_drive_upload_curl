@@ -57,8 +57,9 @@ function _deleteOnGoogleDrive()
     echo $RESPONSE_JSON_DEL
 }
 
-# Get the variable from drive_config.sh 
 SRC_DIR=$(dirname "$0")"/"
+
+## Get the variable from drive_config.sh 
 . $SRC_DIR"drive_config.sh"
 
 DRIVE_FILES_LIST=${DRIVE_FOLDER_ID:(-10)}.list
@@ -74,7 +75,7 @@ echo $DRIVE_FILE_NAME
 DRIVE_FILE_ID=$(grep -zoP '".id":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_UPLOAD)
 echo $DRIVE_FILE_ID
 
-# Check the response if the upload success.  Stop the script if error find. Delete old file if upload successfully.
+## Check the response if the upload success.  Stop the script if error find. Delete old file if upload successfully.
 if [ $ERROR_CODE != "null" ]; then
     echo "error"
     echo $ERROR_CODE
