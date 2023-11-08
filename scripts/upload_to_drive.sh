@@ -41,31 +41,36 @@ function _getAccessToken()
 UPLOAD_FILE=""
 MIMETYPE=""
 DRIVE_FOLDER_ID=""
+KEEP_No_FILES=3
 
 function _uploadToGoogleDrive()
 {
-    RESPONSE_JSON=$(curl -X POST -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" \
+    RESPONSE_JSON_UPLOAD=$(curl -X POST -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" \
     -F "metadata={name : '$UPLOAD_FILE', parents : ['$DRIVE_FOLDER_ID']};type=application/json;charset=UTF-8" \
     -F "file=@$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
 }
 
 function _deleteOnGoogleDrive()
 {
-    RESPONSE_JSON=$(curl -X DELETE -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" "https://www.googleapis.com/drive/v3/files/$DRIVE_FILE_ID")
+    echo "!! File ID = $DEL_FILE_ID is going DELETED !!
+    RESPONSE_JSON_DEL=$(curl -X DELETE -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" "https://www.googleapis.com/drive/v3/files/$DEL_FILE_ID")
+    echo $RESPONSE_JSON_DEL
 }
 
 SRC_DIR=$(dirname "$0")"/"
 . $SRC_DIR"drive_config.sh"
 
+DRIVE_FILES_LIST=${DRIVE_FOLDER_ID:(-10)}.list
+
 _getAccessToken
 _uploadToGoogleDrive
 
-echo $RESPONSE_JSON
-ERROR_CODE=$(grep -zoP '".error.code":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON)
+echo $RESPONSE_JSON_UPLOAD
+ERROR_CODE=$(grep -zoP '".error.code":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_UPLOAD)
 echo $ERROR_CODE
-DRIVE_FILE_NAME=$(grep -zoP '".name":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON)
+DRIVE_FILE_NAME=$(grep -zoP '".name":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_UPLOAD)
 echo $DRIVE_FILE_NAME
-DRIVE_FILE_ID=$(grep -zoP '".id":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON)
+DRIVE_FILE_ID=$(grep -zoP '".id":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_UPLOAD)
 echo $DRIVE_FILE_ID
 
 if [ $ERROR_CODE != "null" ]; then
@@ -74,8 +79,12 @@ if [ $ERROR_CODE != "null" ]; then
     exit 1
 else
     echo "no error"
-    echo $RESPONSE_JSON
-    echo $DRIVE_FILE_ID >> ${DRIVE_FOLDER_ID:(-10)}.list
-    _deleteOnGoogleDrive
+    echo $RESPONSE_JSON_UPLOAD
+    echo $DRIVE_FILE_ID >> $DRIVE_FILES_LIST
+    DRIVE_FILES_COUNT=$(wc -l < $DRIVE_FILES_LIST)
+    if [ $DRIVE_FILES_COUNT -gt  $KEEP_No_FILES ]; then
+        DEL_FILE_ID=$(head $DRIVE_FILES_LIST -n1)
+        _deleteOnGoogleDrive
+    fi
     exit 0
 fi
