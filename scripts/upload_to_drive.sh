@@ -52,7 +52,7 @@ function _uploadToGoogleDrive()
 
 function _deleteOnGoogleDrive()
 {
-    echo "!! File ID = $DEL_FILE_ID is going to DELETED !!
+    echo "!! File ID = $DEL_FILE_ID is going to DELETED !!"
     RESPONSE_JSON_DEL=$(curl -X DELETE -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" "https://www.googleapis.com/drive/v3/files/$DEL_FILE_ID")
     echo $RESPONSE_JSON_DEL
 }
