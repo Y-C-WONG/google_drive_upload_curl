@@ -53,6 +53,7 @@ function _uploadToGoogleDrive()
 function _deleteOnGoogleDrive()
 {
     echo "!! File ID = $DEL_FILE_ID is going to DELETED !!"
+    echo "https://www.googleapis.com/drive/v3/files/$DEL_FILE_ID"
     RESPONSE_JSON_DEL=$(curl -X DELETE -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" "https://www.googleapis.com/drive/v3/files/$DEL_FILE_ID")
     echo $RESPONSE_JSON_DEL
 }
@@ -70,9 +71,9 @@ _uploadToGoogleDrive
 echo $RESPONSE_JSON_UPLOAD
 ERROR_CODE=$(grep -zoP '".error.code":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_UPLOAD)
 echo $ERROR_CODE
-DRIVE_FILE_NAME=$(grep -zoP '".name":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_UPLOAD)
+DRIVE_FILE_NAME=$(grep -zoP '"name":\s*"\K[^\s,]*(?=\s*",)' <<< $RESPONSE_JSON_UPLOAD)
 echo $DRIVE_FILE_NAME
-DRIVE_FILE_ID=$(grep -zoP '".id":\s*\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_UPLOAD)
+DRIVE_FILE_ID=$(grep -zoP '"id":\s*"\K[^\s,]*(?=\s*",)' <<< $RESPONSE_JSON_UPLOAD)
 echo $DRIVE_FILE_ID
 
 ## Check the response if the upload success.  Stop the script if error find. Delete old file if upload successfully.
