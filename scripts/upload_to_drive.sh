@@ -46,24 +46,52 @@ KEEP_No_FILES=3
 function _uploadToGoogleDrive()
 {
     RESPONSE_JSON_UPLOAD=$(curl -X POST -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" \
-    -F "metadata={name : '$UPLOAD_FILE', parents : ['$DRIVE_FOLDER_ID']};type=application/json;charset=UTF-8" \
+    -F "metadata={name : '$UPLOAD_FILE', parents : ['$DRIVE_FOLDER_ID'], description : 'Wordpress Backup Archive File', appProperties:{'WPBAKFILE':'YES'}};type=application/json;charset=UTF-8" \
     -F "file=@$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
 }
 
 function _deleteOnGoogleDrive()
 {
-    echo "!! File ID = $DEL_FILE_ID is going to DELETED !!"
+    echo "!! File ID = $DEL_FILE_ID is being DELETED !!"
     echo "https://www.googleapis.com/drive/v3/files/$DEL_FILE_ID"
     RESPONSE_JSON_DEL=$(curl -X DELETE -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" "https://www.googleapis.com/drive/v3/files/$DEL_FILE_ID")
     echo $RESPONSE_JSON_DEL
+}
+
+function _getDelFileList()
+{
+        echo "!! List of the children for folder $DRIVE_FOLDER_ID !!"
+RESPONSE_JSON_DEL_FILE=$(curl -G -s -S -L -d "orderBy=createdTime" -d "pageSize=10" -d "q='$DRIVE_FOLDER_ID'%20in%20parents%20and%20trashed%3Dfalse%20and%20mimeType='$MIMETYPE'%20and%20appProperties%20has%20{key='WPBAKFILE'%20and%20value='YES'}" -H "Authorization: Bearer $ACCESS_TOKEN" -H "Accept: application/json" --compressed "https://www.googleapis.com/drive/v3/files")
+        echo $RESPONSE_JSON_DEL_FILE
+
+        DRIVE_DEL_FILE_IDs=$(grep -zoP '"id":\s*"\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_DEL_FILE)
+        IFS='"' read -r -a DRIVE_DEL_FILE_LIST <<< "$DRIVE_DEL_FILE_IDs"
+        printf 'File ID -> %s\n' "${DRIVE_DEL_FILE_LIST[@]}"
+        if [ -z $DRIVE_DEL_FILE_IDs ]; then
+            echo '!!! Cannot retrived file list or no file can be found !!!'
+            echo $RESPONSE_JSON_DEL_FILE > GET_DEL_FILE_LIST_ERROR.log
+            exit 1
+        else
+            DRIVE_DEL_FILE_COUNT=${#DRIVE_DEL_FILE_LIST[*]}
+            echo $DRIVE_DEL_FILE_COUNT
+            echo $KEEP_No_FILES
+            if [ $DRIVE_DEL_FILE_COUNT -gt $KEEP_No_FILES ]; then
+                    TTL_DEL_FILE_COUNT="$(($DRIVE_DEL_FILE_COUNT-$KEEP_No_FILES))"
+                echo $TTL_DEL_FILE_COUNT
+                DEL_FILE_ID_LIST=()
+                for (( i=0; i<$TTL_DEL_FILE_COUNT; i++ ));
+                    do
+                        DEL_FILE_ID_LIST[$i]="${DRIVE_DEL_FILE_LIST[$i]}"
+                    done
+                printf 'DEL File ID -> %s\n' "${DEL_FILE_ID_LIST[@]}"
+            fi
+        fi
 }
 
 SRC_DIR=$(dirname "$0")"/"
 
 ## Get the variable from drive_config.sh 
 . $SRC_DIR"drive_config.sh"
-
-DRIVE_FILES_LIST=${DRIVE_FOLDER_ID:(-10)}.list
 
 _getAccessToken
 _uploadToGoogleDrive
@@ -85,12 +113,12 @@ if [ -z $DRIVE_FILE_ID ]; then
 else
     echo "no error"
     echo $RESPONSE_JSON_UPLOAD
-    echo $DRIVE_FILE_ID >> $DRIVE_FILES_LIST
-    DRIVE_FILES_COUNT=$(wc -l < $DRIVE_FILES_LIST)
-    if [ $DRIVE_FILES_COUNT -gt  $KEEP_No_FILES ]; then
-        DEL_FILE_ID=$(head $DRIVE_FILES_LIST -n1)
+    _getDelFileList
+    echo "--- Start Del Drive File ---"
+    for DEL_FILE_ID in "${DEL_FILE_ID_LIST[@]}"
+    do
+        echo "$DEL_FILE_ID"
         _deleteOnGoogleDrive
-        sed -i 1d $DRIVE_FILES_LIST
-    fi
-    exit 0
+    done
 fi
+exit 0
