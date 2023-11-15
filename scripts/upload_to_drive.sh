@@ -47,7 +47,7 @@ function _uploadToGoogleDrive()
 {
     RESPONSE_JSON_UPLOAD=$(curl -X POST -s -S -L -H "Authorization: Bearer $ACCESS_TOKEN" \
     -F "metadata={name : '$UPLOAD_FILE', parents : ['$DRIVE_FOLDER_ID'], description : 'Wordpress Backup Archive File', appProperties:{'WPBAKFILE':'YES'}};type=application/json;charset=UTF-8" \
-    -F "file=@$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
+    -F "file=@$UPLOAD_FILE_PATH$UPLOAD_FILE;type=$MIMETYPE" "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart")
 }
 
 function _deleteOnGoogleDrive()
