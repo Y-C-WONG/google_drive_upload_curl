@@ -69,7 +69,7 @@ RESPONSE_JSON_DEL_FILE=$(curl -G -s -S -L -d "orderBy=createdTime" -d "pageSize=
         printf 'File ID -> %s\n' "${DRIVE_DEL_FILE_LIST[@]}"
         if [ -z $DRIVE_DEL_FILE_IDs ]; then
             echo '!!! Cannot retrived file list or no file can be found !!!'
-            echo $RESPONSE_JSON_DEL_FILE > GET_DEL_FILE_LIST_ERROR.log
+            echo $RESPONSE_JSON_DEL_FILE > $SRC_DIR"GET_DEL_FILE_LIST_ERROR.log"
             exit 1
         else
             DRIVE_DEL_FILE_COUNT=${#DRIVE_DEL_FILE_LIST[*]}
@@ -108,7 +108,7 @@ echo $DRIVE_FILE_ID
 if [ -z $DRIVE_FILE_ID ]; then
     echo "error"
     echo $ERROR_CODE
-    echo $RESPONSE_JSON_UPLOAD > UPLOAD_ERROR.log
+    echo $RESPONSE_JSON_UPLOAD > $SRC_DIR"UPLOAD_ERROR.log"
     exit 1
 else
     echo "no error"
