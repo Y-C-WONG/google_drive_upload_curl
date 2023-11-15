@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#RC_DIR=$(dirname "$0")"/"
+SRC_DIR=$(dirname "$0")"/"
 . $SRC_DIR"drive_config.sh"
 
 echo "CLIENT_ID=$CLIENT_ID"
