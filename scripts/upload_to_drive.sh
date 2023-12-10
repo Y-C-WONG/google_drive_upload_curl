@@ -64,7 +64,7 @@ function _getDelFileList()
 RESPONSE_JSON_DEL_FILE=$(curl -G -s -S -L -d "orderBy=createdTime" -d "pageSize=10" -d "q='$DRIVE_FOLDER_ID'%20in%20parents%20and%20trashed%3Dfalse%20and%20mimeType='$MIMETYPE'%20and%20appProperties%20has%20{key='WPBAKFILE'%20and%20value='YES'}" -H "Authorization: Bearer $ACCESS_TOKEN" -H "Accept: application/json" --compressed "https://www.googleapis.com/drive/v3/files")
         echo $RESPONSE_JSON_DEL_FILE
 
-        DRIVE_DEL_FILE_IDs=$(grep -zoP '"id":\s*"\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_DEL_FILE)
+        DRIVE_DEL_FILE_IDs=$(printf %b $(grep -zoP '"id":\s*"\K[^\s,]*(?=\s*,)' <<< $RESPONSE_JSON_DEL_FILE))
         IFS='"' read -r -a DRIVE_DEL_FILE_LIST <<< "$DRIVE_DEL_FILE_IDs"
         printf 'File ID -> %s\n' "${DRIVE_DEL_FILE_LIST[@]}"
         if [ -z $DRIVE_DEL_FILE_IDs ]; then
